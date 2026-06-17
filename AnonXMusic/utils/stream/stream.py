@@ -2,14 +2,14 @@ import os
 from random import randint
 from typing import Union
 
-from pyrogram.types import InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton  # InlineKeyboardButton explicitly keep kiya gaya hai
+from pyrogram import enums  # Color style ke liye enums ko use kiya gaya hai
 
 import config
 from AnonXMusic import Carbon, YouTube, app
 from AnonXMusic.core.call import Anony
 from AnonXMusic.misc import db
 from AnonXMusic.utils.database import add_active_video_chat, is_active_chat
-from AnonXMusic.utils.exceptions import AssistantErr
 from AnonXMusic.utils.inline import aq_markup, close_markup, stream_markup
 from AnonXMusic.utils.pastebin import AnonyBin
 from AnonXMusic.utils.stream.queue import put_queue, put_queue_index
@@ -156,11 +156,17 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
-            button = aq_markup(_, chat_id)
+            
+            # --- CODE MODIFIED HERE ONLY ---
+            custom_queue_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton(text="▶️ PLAY NOW", callback_data=f"admin_skip {position}", style=enums.ButtonStyle.SUCCESS)]
+            ])
+            # -------------------------------
+            
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                reply_markup=InlineKeyboardMarkup(button),
+                reply_markup=custom_queue_markup,
             )
         else:
             if not forceplay:
@@ -216,11 +222,17 @@ async def stream(
                 "audio",
             )
             position = len(db.get(chat_id)) - 1
-            button = aq_markup(_, chat_id)
+            
+            # --- CODE MODIFIED HERE ONLY ---
+            custom_queue_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton(text="▶️ PLAY NOW", callback_data=f"admin_skip {position}", style=enums.ButtonStyle.SUCCESS)]
+            ])
+            # -------------------------------
+            
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                reply_markup=InlineKeyboardMarkup(button),
+                reply_markup=custom_queue_markup,
             )
         else:
             if not forceplay:
@@ -268,11 +280,17 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
-            button = aq_markup(_, chat_id)
+            
+            # --- CODE MODIFIED HERE ONLY ---
+            custom_queue_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton(text="▶️ PLAY NOW", callback_data=f"admin_skip {position}", style=enums.ButtonStyle.SUCCESS)]
+            ])
+            # -------------------------------
+            
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                reply_markup=InlineKeyboardMarkup(button),
+                reply_markup=custom_queue_markup,
             )
         else:
             if not forceplay:
@@ -321,11 +339,17 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
-            button = aq_markup(_, chat_id)
+            
+            # --- CODE MODIFIED HERE ONLY ---
+            custom_queue_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton(text="▶️ PLAY NOW", callback_data=f"admin_skip {position}", style=enums.ButtonStyle.SUCCESS)]
+            ])
+            # -------------------------------
+            
             await app.send_message(
                 chat_id=original_chat_id,
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                reply_markup=InlineKeyboardMarkup(button),
+                reply_markup=custom_queue_markup,
             )
         else:
             if not forceplay:
@@ -383,10 +407,16 @@ async def stream(
                 "video" if video else "audio",
             )
             position = len(db.get(chat_id)) - 1
-            button = aq_markup(_, chat_id)
+            
+            # --- CODE MODIFIED HERE ONLY ---
+            custom_queue_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton(text="▶️ PLAY NOW", callback_data=f"admin_skip {position}", style=enums.ButtonStyle.SUCCESS)]
+            ])
+            # -------------------------------
+            
             await mystic.edit_text(
                 text=_["queue_4"].format(position, title[:27], duration_min, user_name),
-                reply_markup=InlineKeyboardMarkup(button),
+                reply_markup=custom_queue_markup,
             )
         else:
             if not forceplay:
