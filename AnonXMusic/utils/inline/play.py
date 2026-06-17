@@ -62,7 +62,8 @@ class Inline:
                 ]
             )
 
-        return keyboard
+        # FIX: Wrapped in self.ikm() so Pyrogram can read it as a proper markup
+        return self.ikm(keyboard)
 
     # INTERACTIVE MATHEMATICAL GRAPHIC LOOP
     def stream_markup_timer(self, _, chat_id: int, played: str, duration: str):
@@ -74,19 +75,18 @@ class Inline:
         try:
             p_min, p_sec = map(int, played.split(":"))
             d_min, d_sec = map(int, duration.split(":"))
-            
+
             played_seconds = (p_min * 60) + p_sec
             total_seconds = (d_min * 60) + d_sec
-            
+
             percentage = (played_seconds / total_seconds) * 100 if total_seconds > 0 else 0
         except:
             percentage = 0
 
-        # Custom Textile Geometric Curved Track
-  
-       textile_track = ["▰", "▱", "▱", "▱", "▱", "▱", "▱", "▱", "▱", "▱"]
+        # FIX: Corrected Indentation here (8 spaces instead of 7)
+        textile_track = ["▰", "▱", "▱", "▱", "▱", "▱", "▱", "▱", "▱", "▱"]
         total_steps = len(textile_track)
-        
+
         active_pos = math.floor((percentage / 100) * total_steps)
         if active_pos >= total_steps:
             active_pos = total_steps - 1
@@ -109,7 +109,7 @@ class Inline:
 
         # Pure graphic layout frame
         full_graphic_bar = f"𝄃 {played_font} ❖ {bar_text} ❖ {duration_font} 𝄃"
-        
+
         # Action based background color (End phase par automatic Red/Danger ho jayega)
         button_color = "danger" if percentage >= 85 else "success"
         timer_row = [self._button(text=full_graphic_bar, category=button_color, callback_data="noop")]
