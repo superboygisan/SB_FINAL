@@ -63,7 +63,7 @@ class Inline:
             )
 
         # FIX: Wrapped in self.ikm() so Pyrogram can read it as a proper markup
-        return self.ikm(keyboard)
+        return keyboard 
 
     # INTERACTIVE MATHEMATICAL GRAPHIC LOOP
     def stream_markup_timer(self, _, chat_id: int, played: str, duration: str):
@@ -84,7 +84,7 @@ class Inline:
             percentage = 0
 
         # FIX: Corrected Indentation here (8 spaces instead of 7)
-        textile_track = ["▰", "▱", "▱", "▱", "▱", "▱", "▱", "▱", "▱", "▱"]
+        textile_track = ["@", "II", "_", "S", "I", "M", "P", "L", "E", "II"]
         total_steps = len(textile_track)
 
         active_pos = math.floor((percentage / 100) * total_steps)
