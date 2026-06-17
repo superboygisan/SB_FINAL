@@ -1,155 +1,142 @@
 import math
+from pyrogram import enums, types
 
-from pyrogram.types import InlineKeyboardButton
+class Inline:
+    def __init__(self):
+        self.ikm = types.InlineKeyboardMarkup
+        self.ikb = types.InlineKeyboardButton
 
-from AnonXMusic.utils.formatters import time_to_seconds
+        self.styles = {
+            "default": enums.ButtonStyle.DEFAULT,
+            "primary": enums.ButtonStyle.PRIMARY,
+            "success": enums.ButtonStyle.SUCCESS,
+            "danger": enums.ButtonStyle.DANGER,
+        }
 
+    def _button(self, text: str, category: str = "default", **kwargs):
+        return self.ikb(
+            text=text,
+            style=self.styles.get(category, enums.ButtonStyle.DEFAULT),
+            **kwargs,
+        )
 
-def track_markup(_, videoid, user_id, channel, fplay):
-    buttons = [
-        [
-            InlineKeyboardButton(
-                text=_["P_B_1"],
-                callback_data=f"MusicStream {videoid}|{user_id}|a|{channel}|{fplay}",
-            ),
-            InlineKeyboardButton(
-                text=_["P_B_2"],
-                callback_data=f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"],
-                callback_data=f"forceclose {videoid}|{user_id}",
+    # MAIN CONTROL HUB
+    def track_markup(self, _, chat_id: int, status: str = None, timer_row: list = None, remove: bool = False):
+        keyboard = []
+
+        # Abstract Graphic Progress Button sabse upar rahega
+        if timer_row:
+            keyboard.append(timer_row)
+        elif status:
+            keyboard.append([self._button(text=status, category="default", callback_data="noop")])
+
+        # MAIN CONTROLS ROW (Sleek Compact Layout - No text on buttons)
+        if not remove:
+            keyboard.append(
+                [
+                    self._button(
+                        text="▶️",
+                        category="success",
+                        callback_data=f"ADMIN Resume|{chat_id}",
+                    ),
+                    self._button(
+                        text="⏮️",
+                        category="primary",
+                        callback_data=f"ADMIN Replay|{chat_id}",
+                    ),
+                    self._button(
+                        text="⏸️",
+                        category="primary",
+                        callback_data=f"ADMIN Pause|{chat_id}",
+                    ),
+                    self._button(
+                        text="⏭️",
+                        category="primary",
+                        callback_data=f"ADMIN Skip|{chat_id}",
+                    ),
+                    self._button(
+                        text="⏹️",
+                        category="danger",
+                        callback_data=f"ADMIN Stop|{chat_id}",
+                    ),
+                ]
             )
-        ],
-    ]
-    return buttons
 
+        return keyboard
 
-def stream_markup_timer(_, chat_id, played, dur):
-    played_sec = time_to_seconds(played)
-    duration_sec = time_to_seconds(dur)
-    percentage = (played_sec / duration_sec) * 100
-    umm = math.floor(percentage)
-    if 0 < umm <= 10:
-        bar = "◉—————————"
-    elif 10 < umm < 20:
-        bar = "—◉————————"
-    elif 20 <= umm < 30:
-        bar = "——◉———————"
-    elif 30 <= umm < 40:
-        bar = "———◉——————"
-    elif 40 <= umm < 50:
-        bar = "————◉—————"
-    elif 50 <= umm < 60:
-        bar = "—————◉————"
-    elif 60 <= umm < 70:
-        bar = "——————◉———"
-    elif 70 <= umm < 80:
-        bar = "———————◉——"
-    elif 80 <= umm < 95:
-        bar = "————————◉—"
-    else:
-        bar = "—————————◉"
-    buttons = [
-        [
-            InlineKeyboardButton(
-                text=f"{played} {bar} {dur}",
-                callback_data="GetTimer",
-            )
-        ],
-        [   
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-            InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
-            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
-        ],
-    ]
-    
-    return buttons
+    # INTERACTIVE MATHEMATICAL GRAPHIC LOOP
+    def stream_markup_timer(self, _, chat_id: int, played: str, duration: str):
+        # Normal digits ko mathematical bold script fonts mein convert karne ke liye helper
+        def to_script_font(time_str):
+            font_map = {'0': '𝟬', '1': '𝟭', '2': '𝟮', '3': '𝟯', '4': '𝟰', '5': '𝟱', '6': '𝟲', '7': '𝟳', '8': '𝟴', '9': '𝟵', ':': '𝄊'}
+            return "".join(font_map.get(c, c) for c in time_str)
 
+        try:
+            p_min, p_sec = map(int, played.split(":"))
+            d_min, d_sec = map(int, duration.split(":"))
+            
+            played_seconds = (p_min * 60) + p_sec
+            total_seconds = (d_min * 60) + d_sec
+            
+            percentage = (played_seconds / total_seconds) * 100 if total_seconds > 0 else 0
+        except:
+            percentage = 0
 
-def stream_markup(_, chat_id):
-    buttons = [
-        [
-            InlineKeyboardButton(text="▷", callback_data=f"ADMIN Resume|{chat_id}"),
-            InlineKeyboardButton(text="II", callback_data=f"ADMIN Pause|{chat_id}"),
-            InlineKeyboardButton(text="↻", callback_data=f"ADMIN Replay|{chat_id}"),
-            InlineKeyboardButton(text="‣‣I", callback_data=f"ADMIN Skip|{chat_id}"),
-            InlineKeyboardButton(text="▢", callback_data=f"ADMIN Stop|{chat_id}"),
-        ],
-    ]
-    return buttons
+        # Custom Textile Geometric Curved Track (Bina kisi ordinary text ke)
+        textile_track = ["𝄜", "𝄝", "𝄞", "𝄟", "𝄠", "𝄡", "𝄢", "𝄣", "𝄤", "𝄥"]
+        total_steps = len(textile_track)
+        
+        active_pos = math.floor((percentage / 100) * total_steps)
+        if active_pos >= total_steps:
+            active_pos = total_steps - 1
 
+        bar_text = ""
+        for i in range(total_steps):
+            if i < active_pos:
+                # Solid matrix flow blocks (Snake tail/body)
+                bar_text += "𝌆" 
+            elif i == active_pos:
+                # Moving prism node (Active snake head)
+                bar_text += "𝋃"
+            else:
+                # Wave vectors path yet to cover
+                bar_text += textile_track[i]
 
-def playlist_markup(_, videoid, user_id, ptype, channel, fplay):
-    buttons = [
-        [
-            InlineKeyboardButton(
-                text=_["P_B_1"],
-                callback_data=f"AnonyPlaylists {videoid}|{user_id}|{ptype}|a|{channel}|{fplay}",
-            ),
-            InlineKeyboardButton(
-                text=_["P_B_2"],
-                callback_data=f"AnonyPlaylists {videoid}|{user_id}|{ptype}|v|{channel}|{fplay}",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"],
-                callback_data=f"forceclose {videoid}|{user_id}",
-            ),
-        ],
-    ]
-    return buttons
+        # Script styled counters build karna
+        played_font = to_script_font(played)
+        duration_font = to_script_font(duration)
 
+        # Pure graphic layout frame
+        full_graphic_bar = f"𝄃𝄃 {played_font} ❖ {bar_text} ❖ {duration_font} 𝄃𝄃"
+        
+        # Action based background color (End phase par automatic Red/Danger ho jayega)
+        button_color = "danger" if percentage >= 85 else "success"
+        timer_row = [self._button(text=full_graphic_bar, category=button_color, callback_data="noop")]
 
-def livestream_markup(_, videoid, user_id, mode, channel, fplay):
-    buttons = [
-        [
-            InlineKeyboardButton(
-                text=_["P_B_3"],
-                callback_data=f"LiveStream {videoid}|{user_id}|{mode}|{channel}|{fplay}",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"],
-                callback_data=f"forceclose {videoid}|{user_id}",
-            ),
-        ],
-    ]
-    return buttons
+        return self.track_markup(_, chat_id, timer_row=timer_row)
 
+    # ALL RECOVERY BACKUPS TO PREVENT SYSTEM CRASH
+    def playlist_markup(self, _, chat_id: int): return self.track_markup(_, chat_id)
+    def livestream_markup(self, _, chat_id: int): return self.track_markup(_, chat_id)
+    def slider_markup(self, _, chat_id: int): return self.track_markup(_, chat_id)
+    def queue_markup(self, chat_id: int, text: str, playing: bool = False):
+        action = "pause" if playing else "resume"
+        return self.ikm([[self._button(text=text, category="success" if playing else "danger", callback_data=f"ADMIN {action.capitalize()}|{chat_id}")]])
+    def play_queued(self, chat_id: int, item_id: str, text: str):
+        return self.ikm([[self._button(text=text, category="success", callback_data=f"ADMIN Resume|{chat_id}")]])
+    def yt_key(self, link: str):
+        return self.ikm([[self._button(text="📋 Copy Link", category="primary", copy_text=link), self._button(text="🎬 YouTube", category="danger", url=link)]])
 
-def slider_markup(_, videoid, user_id, query, query_type, channel, fplay):
-    query = f"{query[:20]}"
-    buttons = [
-        [
-            InlineKeyboardButton(
-                text=_["P_B_1"],
-                callback_data=f"MusicStream {videoid}|{user_id}|a|{channel}|{fplay}",
-            ),
-            InlineKeyboardButton(
-                text=_["P_B_2"],
-                callback_data=f"MusicStream {videoid}|{user_id}|v|{channel}|{fplay}",
-            ),
-        ],
-        [
-            InlineKeyboardButton(
-                text="◁",
-                callback_data=f"slider B|{query_type}|{query}|{user_id}|{channel}|{fplay}",
-            ),
-            InlineKeyboardButton(
-                text=_["CLOSE_BUTTON"],
-                callback_data=f"forceclose {query}|{user_id}",
-            ),
-            InlineKeyboardButton(
-                text="▷",
-                callback_data=f"slider F|{query_type}|{query}|{user_id}|{channel}|{fplay}",
-            ),
-        ],
-    ]
-    return buttons
+buttons = Inline()
+
+# MAPPING ALL VARIABLES FOR FULL PLUGIN COMPATIBILITY
+controls = buttons.track_markup
+track_markup = buttons.track_markup
+stream_markup = buttons.track_markup
+stream_markup_timer = buttons.stream_markup_timer
+playlist_markup = buttons.playlist_markup
+livestream_markup = buttons.livestream_markup
+slider_markup = buttons.slider_markup
+queue_markup = buttons.queue_markup
+play_queued = buttons.play_queued
+yt_key = buttons.yt_key
