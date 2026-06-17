@@ -84,7 +84,7 @@ class Inline:
             percentage = 0
 
         # FIX: Corrected Indentation here (8 spaces instead of 7)
-        textile_track = ["@", "II", "_", "S", "I", "M", "P", "L", "E", "II"]
+        textile_track = ["", "II", "_", "S", "I", "M", "P", "L", "E", "_II"]
         total_steps = len(textile_track)
 
         active_pos = math.floor((percentage / 100) * total_steps)
