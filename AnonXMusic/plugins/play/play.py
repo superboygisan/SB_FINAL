@@ -14,7 +14,7 @@ from AnonXMusic.utils.channelplay import get_channeplayCB
 from AnonXMusic.utils.decorators.language import languageCB
 from AnonXMusic.utils.decorators.play import PlayWrapper
 from AnonXMusic.utils.formatters import formats
-from AnonXMusic.utils.inline import (
+from AnonXMusic.utils.inline.play import (
     botplaylist_markup,
     livestream_markup,
     playlist_markup,
