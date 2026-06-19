@@ -39,12 +39,12 @@ async def join_watcher(_, message: Message):
                 LOG_GROUP_ID,
                 photo=random.choice(PHOTO),
                 caption=(
-                    f"**📝 Music Bot Added In A New Group**\n\n"
-                    f"**📌 Chat Name :** {message.chat.title}\n"
-                    f"**🆔 Chat ID :** `{message.chat.id}`\n"
-                    f"**🔗 Username :** @{username if message.chat.username else 'None'}\n"
-                    f"**👥 Members :** {count}\n"
-                    f"**➕ Added By :** {message.from_user.mention if message.from_user else 'Unknown'}"
+                    f"📝𝐌ᴜsɪᴄ 𝐁ᴏᴛ 𝐀ᴅᴅᴇᴅ 𝐈ɴ 𝐀 #𝐍ᴇᴡ_𝐆ʀᴏᴜᴘ**\n\n"
+                    f"📌𝐂ʜᴀᴛ 𝐍ᴀᴍᴇ: {message.chat.title}\n"
+                    f"🍂𝐂ʜᴀᴛ 𝐈ᴅ: `{message.chat.id}`\n"
+                    f"🔐𝐂ʜᴀᴛ 𝐔sᴇʀɴᴀᴍᴇ: @{username if message.chat.username else 'None'}\n"
+                    f"📈𝐆ʀᴏᴜᴘ 𝐌ᴇᴍʙᴇʀs: {count}\n"
+                    f"🤔𝐀ᴅᴅᴇᴅ 𝐁ʏ: {message.from_user.mention if message.from_user else 'Unknown'}"
                 ),
                 reply_markup=InlineKeyboardMarkup(
                     [
