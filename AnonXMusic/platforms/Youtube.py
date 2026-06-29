@@ -401,7 +401,13 @@ class YouTubeAPI:
                 getAudio = session.get(f"{YTPROXY}/info/{vid_id}", headers=headers, timeout=60)
 
                 try:
-                    songData = getAudio.json()
+                    if getAudio.status_code == 410:
+    logger.error(
+        "YTProxy returned HTTP 410 (Gone). Falling back to yt-dlp."
+    )
+    raise requests.exceptions.RequestException("Proxy Gone")
+
+songData = getAudio.json()
                 except Exception as e:
                     logger.error(f"Invalid response from API: {str(e)}")
                     return None
