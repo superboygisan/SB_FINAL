@@ -1,5 +1,6 @@
 import asyncio
 import importlib
+import signal
 
 from pyrogram import idle
 from pytgcalls.exceptions import NoActiveGroupCall
@@ -11,6 +12,14 @@ from AnonXMusic.misc import sudo
 from AnonXMusic.plugins import ALL_MODULES
 from AnonXMusic.utils.database import get_banned_users, get_gbanned
 from config import BANNED_USERS
+
+# Added for proper shutdown (task leaks fix)
+async def shutdown(signal, loop):
+    LOGGER("AnonXMusic").info(f"Received exit signal {signal.name}...")
+    tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
+    [task.cancel() for task in tasks]
+    await asyncio.gather(*tasks, return_exceptions=True)
+    loop.stop()
 
 async def init():
     if (
@@ -55,4 +64,18 @@ async def init():
 
 
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(init())
+    loop = asyncio.get_event_loop()
+    
+    # Signal handlers for clean shutdown
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        loop.add_signal_handler(
+            sig,
+            lambda s=sig: asyncio.create_task(shutdown(s, loop))
+        )
+    
+    try:
+        loop.run_until_complete(init())
+    except asyncio.CancelledError:
+        pass
+    finally:
+        loop.close()
