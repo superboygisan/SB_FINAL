@@ -93,7 +93,6 @@ class YouTubeAPI:
         elif "&si=" in link:
             link = link.split("&si=")[0]
 
-
         results = VideosSearch(link, limit=1)
         for result in (await results.next())["result"]:
             title = result["title"]
@@ -335,75 +334,79 @@ class YouTubeAPI:
             link = self.base + link
         loop = asyncio.get_running_loop()
 
+        # Human-like Headers
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36",
+            "Accept-Language": "en-US,en;q=0.9",
+            "Referer": "https://www.youtube.com/",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+        }
+
         def create_session():
             session = requests.Session()
-            retries = Retry(total=3, backoff_factor=0.1)
+            retries = Retry(total=5, backoff_factor=0.5)
             session.mount('http://', HTTPAdapter(max_retries=retries))
             session.mount('https://', HTTPAdapter(max_retries=retries))
             return session
 
-        async def download_with_requests(url, filepath, headers=None):
+        async def download_with_requests(url, filepath):
             try:
                 session = create_session()
-                response = session.get(
-                    url, 
-                    headers=headers, 
-                    stream=True, 
-                    timeout=60,
-                    allow_redirects=True
-                )
+                response = session.get(url, headers=headers, stream=True, timeout=120, allow_redirects=True)
                 response.raise_for_status()
 
-                total_size = int(response.headers.get('content-length', 0))
-                downloaded = 0
-                chunk_size = 1024 * 1024
-
                 with open(filepath, 'wb') as file:
-                    for chunk in response.iter_content(chunk_size=chunk_size):
+                    for chunk in response.iter_content(chunk_size=1024*1024):
                         if chunk:
                             file.write(chunk)
-                            downloaded += len(chunk)
-
                 return filepath
-
             except Exception as e:
-                logger.error(f"Requests download failed: {str(e)}")
+                logger.error(f"Download failed: {str(e)}")
                 if os.path.exists(filepath):
                     os.remove(filepath)
                 return None
             finally:
                 session.close()
 
-        # === ORIGINAL PROXY LOGIC (preserved) ===
+        # === PRIORITY 1: Try Proxy (your original logic preserved) ===
         try:
-            if not YT_API_KEY:
-                logger.error("API KEY not set in config, Set API Key you got from @tgmusic_apibot")
-                # Fallback to yt-dlp
-                pass
-            if not YTPROXY:
-                logger.error("API Endpoint not set in config\nPlease set a valid endpoint for YTPROXY_URL in config.")
-                # Fallback
-                pass
-            # ... (aapka purana code yahan same)
-        except:
-            pass
+            if YT_API_KEY and YTPROXY:
+                session = create_session()
+                getAudio = session.get(f"{YTPROXY}/info/{vid_id}", headers={
+                    "x-api-key": YT_API_KEY,
+                    **headers
+                }, timeout=60)
+                songData = getAudio.json()
 
-        # === YT-DLP FALLBACK (added without deleting original) ===
+                if songData.get('status') == 'success':
+                    audio_url = songData['audio_url']
+                    filepath = os.path.join("downloads", f"{vid_id}.mp3")
+                    result = await download_with_requests(audio_url, filepath)
+                    if result:
+                        return result
+        except Exception as e:
+            logger.warning(f"Proxy failed: {e}")
+
+        # === PRIORITY 2: yt-dlp with Human Headers (Best Fallback) ===
         try:
             ydl_opts = {
                 'format': 'bestaudio/best' if not video else 'best[height<=720]',
                 'outtmpl': 'downloads/%(id)s.%(ext)s',
                 'quiet': True,
                 'no_warnings': True,
-                'retries': 5,
+                'retries': 10,
+                'http_headers': headers,
                 'continuedl': True,
             }
-            def sync_download():
+
+            def sync_ydl():
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     info = ydl.extract_info(link, download=True)
                     return ydl.prepare_filename(info)
-            file_path = await loop.run_in_executor(None, sync_download)
+
+            file_path = await loop.run_in_executor(None, sync_ydl)
             return file_path
+
         except Exception as e:
-            logger.error(f"yt-dlp fallback failed: {e}")
+            logger.error(f"yt-dlp failed: {e}")
             raise
