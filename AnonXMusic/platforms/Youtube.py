@@ -40,14 +40,24 @@ class YouTubeAPI:
 
     async def search(self, query: str) -> list:
         try:
+                async def search(self, query: str) -> list:
+        try:
             data = await self._request("/search", {"query": query, "limit": 10})
             if data.get("success") and data.get("results"):
-                return data["results"]
+                results = []
+                for item in data["results"][:5]:  # Sirf 5 best results
+                    results.append({
+                        "id": item.get("video_id"),
+                        "title": item.get("title"),
+                        "duration": item.get("duration", "N/A"),
+                        "views": item.get("view_count_text", ""),
+                        "channel": item.get("channel", {}).get("name", ""),
+                    })
+                return results
             return []
-        except:
+        except Exception as e:
+            print(f"Search Error: {e}")
             return []
-
-    async def video(self, video_id: str) -> Tuple[bool, Any]:
         try:
             data = await self._request(f"/video/{video_id}")
             return data.get("success", False), data
