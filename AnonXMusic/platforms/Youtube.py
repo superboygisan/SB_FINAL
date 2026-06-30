@@ -17,7 +17,7 @@ from AnonXMusic.utils.database import is_on_off
 from AnonXMusic.utils.downloader import yt_dlp_download
 from AnonXMusic.utils.errors import capture_internal_err
 from AnonXMusic.config import time_to_seconds
-from AnnieXMedia.utils.tuning import YTDLP_TIMEOUT, YOUTUBE_META_MAX, YOUTUBE_META_TTL
+from AnonXMusic.utils.tuning import YTDLP_TIMEOUT, YOUTUBE_META_MAX, YOUTUBE_META_TTL
 
 
 # === Caches ===
