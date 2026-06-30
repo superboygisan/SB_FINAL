@@ -11,6 +11,15 @@ def dirr():
             os.remove(file)
         elif file.endswith(".png"):
             os.remove(file)
+BASE_DIR = os.getcwd()
+DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
+COUPLE_DIR = os.path.join(BASE_DIR, "couples")
+CACHE_DIR = os.path.join(BASE_DIR, "cache")
+
+os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+    os.makedirs(CACHE_DIR, exist_ok=True)
+    os.makedirs(COUPLE_DIR, exist_ok=True)
+    os.makedirs(BACKUP_DIR, exist_ok=True)
 
     if "downloads" not in os.listdir():
         os.mkdir("downloads")
