@@ -27,7 +27,6 @@ class YouTubeAPI:
             return {"success": False, "error": str(e)}
 
     async def url(self, message):
-        """Message se URL ya query extract karne ke liye"""
         try:
             if message.text and message.text.startswith("http"):
                 return message.text.strip()
@@ -36,6 +35,18 @@ class YouTubeAPI:
                 return query
         except:
             return ""
+
+    # Yeh method add kiya (exists check ke liye)
+    async def exists(self, url: str) -> bool:
+        """Check if URL ya video valid hai"""
+        try:
+            if url.startswith("http"):
+                video_id = url.split("v=")[-1].split("&")[0] if "v=" in url else url.split("/")[-1]
+                data = await self._request(f"/video/{video_id}")
+                return data.get("success", False)
+            return True  # Search query ke liye
+        except:
+            return False
 
     async def search(self, query: str) -> list:
         try:
@@ -73,5 +84,4 @@ class YouTubeAPI:
         if self.session:
             await self.session.close()
 
-# Error fix
 cookie_txt_file = None
