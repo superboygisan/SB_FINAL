@@ -15,42 +15,32 @@ class YouTubeAPI:
     async def _request(self, endpoint: str, params: Optional[Dict] = None) -> Dict:
         session = await self.get_session()
         try:
-            async with session.get(f"{self.api_base}{endpoint}", params=params, timeout=30) as resp:
+            async with session.get(f"{self.api_base}{endpoint}", params=params, timeout=40) as resp:
                 if resp.status == 200:
                     return await resp.json()
                 else:
-                    return {"success": False, "error": f"HTTP {resp.status}"}
-        except asyncio.TimeoutError:
-            return {"success": False, "error": "Timeout"}
+                    text = await resp.text()
+                    print(f"API Error: {resp.status} - {text[:200]}")
+                    return {"success": False}
         except Exception as e:
-            print(f"YouTubeAPI Error: {e}")
-            return {"success": False, "error": str(e)}
+            print(f"Request Error: {e}")
+            return {"success": False}
 
     async def url(self, message):
         try:
-            if message.text and message.text.startswith("http"):
+            if message.text and "http" in message.text:
                 return message.text.strip()
             else:
-                query = message.text.replace("/play", "").strip() if message.text else ""
-                return query
+                return message.text.replace("/play", "").strip() if message.text else ""
         except:
             return ""
 
-    # Yeh method add kiya (exists check ke liye)
     async def exists(self, url: str) -> bool:
-        """Check if URL ya video valid hai"""
-        try:
-            if url.startswith("http"):
-                video_id = url.split("v=")[-1].split("&")[0] if "v=" in url else url.split("/")[-1]
-                data = await self._request(f"/video/{video_id}")
-                return data.get("success", False)
-            return True  # Search query ke liye
-        except:
-            return False
+        return True  # Simple fallback
 
     async def search(self, query: str) -> list:
         try:
-            data = await self._request("/search", {"query": query, "limit": 15})
+            data = await self._request("/search", {"query": query, "limit": 10})
             if data.get("success") and data.get("results"):
                 return data["results"]
             return []
@@ -60,9 +50,7 @@ class YouTubeAPI:
     async def video(self, video_id: str) -> Tuple[bool, Any]:
         try:
             data = await self._request(f"/video/{video_id}")
-            if data.get("success"):
-                return True, data
-            return False, None
+            return data.get("success", False), data
         except:
             return False, None
 
@@ -75,23 +63,15 @@ class YouTubeAPI:
 
     async def next(self, video_id: str) -> Dict:
         try:
-            data = await self._request(f"/next/{video_id}")
-            return data
+            return await self._request(f"/next/{video_id}")
         except:
             return {}
+
+    async def download(self, *args, **kwargs):
+        return None, False
 
     async def close(self):
         if self.session:
             await self.session.close()
-
-    async def player(self, video_id: str) -> Dict:
-        try:
-            data = await self._request(f"/player/{video_id}")
-            # Streaming URL extract karne ke liye
-            if data.get("streaming_data"):
-                return data
-            return data
-        except:
-            return {}
 
 cookie_txt_file = None
