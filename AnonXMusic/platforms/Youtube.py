@@ -26,7 +26,17 @@ class YouTubeAPI:
             print(f"YouTubeAPI Error: {e}")
             return {"success": False, "error": str(e)}
 
-    # Search Songs (purane format ke hisab se)
+    # Yeh method zaroori hai (purane decorators ke liye)
+    async def url(self, message):
+        try:
+            if message.text and message.text.startswith("http"):
+                return message.text.strip()
+            else:
+                query = message.text.replace("/play", "").strip() if message.text else ""
+                return query
+        except:
+            return ""
+
     async def search(self, query: str) -> list:
         try:
             data = await self._request("/search", {"query": query, "limit": 15})
@@ -36,7 +46,6 @@ class YouTubeAPI:
         except:
             return []
 
-    # Video Details
     async def video(self, video_id: str) -> Tuple[bool, Any]:
         try:
             data = await self._request(f"/video/{video_id}")
@@ -46,7 +55,6 @@ class YouTubeAPI:
         except:
             return False, None
 
-    # Player (Streaming URLs ke liye)
     async def player(self, video_id: str) -> Dict:
         try:
             data = await self._request(f"/player/{video_id}")
@@ -54,7 +62,6 @@ class YouTubeAPI:
         except:
             return {}
 
-    # Next / Related (agar zarurat pade)
     async def next(self, video_id: str) -> Dict:
         try:
             data = await self._request(f"/next/{video_id}")
@@ -66,5 +73,4 @@ class YouTubeAPI:
         if self.session:
             await self.session.close()
 
-# Original cookie_txt_file (jo error de raha tha)
 cookie_txt_file = None
