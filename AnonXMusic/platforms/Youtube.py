@@ -15,49 +15,40 @@ class YouTubeAPI:
     async def _request(self, endpoint: str, params: Optional[Dict] = None) -> Dict:
         session = await self.get_session()
         try:
-            async with session.get(f"{self.api_base}{endpoint}", params=params, timeout=40) as resp:
+            async with session.get(f"{self.api_base}{endpoint}", params=params, timeout=30) as resp:
                 if resp.status == 200:
                     return await resp.json()
                 else:
-                    text = await resp.text()
-                    print(f"API Error: {resp.status} - {text[:200]}")
-                    return {"success": False}
+                    return {"success": False, "error": f"HTTP {resp.status}"}
+        except asyncio.TimeoutError:
+            return {"success": False, "error": "Timeout"}
         except Exception as e:
-            print(f"Request Error: {e}")
-            return {"success": False}
+            print(f"YouTubeAPI Error: {e}")
+            return {"success": False, "error": str(e)}
 
     async def url(self, message):
         try:
-            if message.text and "http" in message.text:
+            if message.text and message.text.startswith("http"):
                 return message.text.strip()
             else:
-                return message.text.replace("/play", "").strip() if message.text else ""
+                query = message.text.replace("/play", "").strip() if message.text else ""
+                return query
         except:
             return ""
 
     async def exists(self, url: str) -> bool:
-        return True  # Simple fallback
+        return True
 
     async def search(self, query: str) -> list:
         try:
-                async def search(self, query: str) -> list:
-        try:
             data = await self._request("/search", {"query": query, "limit": 10})
             if data.get("success") and data.get("results"):
-                results = []
-                for item in data["results"][:5]:  # Sirf 5 best results
-                    results.append({
-                        "id": item.get("video_id"),
-                        "title": item.get("title"),
-                        "duration": item.get("duration", "N/A"),
-                        "views": item.get("view_count_text", ""),
-                        "channel": item.get("channel", {}).get("name", ""),
-                    })
-                return results
+                return data["results"]
             return []
-        except Exception as e:
-            print(f"Search Error: {e}")
+        except:
             return []
+
+    async def video(self, video_id: str) -> Tuple[bool, Any]:
         try:
             data = await self._request(f"/video/{video_id}")
             return data.get("success", False), data
