@@ -7,14 +7,27 @@ from pytgcalls.exceptions import NoActiveGroupCall
 
 import config
 from AnonXMusic import LOGGER, app, userbot
-from AnonXMusic.core.call import Anony   # Yeh line sahi hai
+from AnonXMusic.core.call import Anony
 from AnonXMusic.misc import sudo
 from AnonXMusic.plugins import ALL_MODULES
 from AnonXMusic.utils.database import get_banned_users, get_gbanned
 from config import BANNED_USERS
 
+# Platforms
+from AnonXMusic.platforms import *
+YouTube = YouTubeAPI()   # ← InnerTube ke saath connected
+
 async def shutdown(signal, loop):
     LOGGER("AnonXMusic").info(f"Received exit signal {signal.name}...")
+    
+    # YouTube API session close
+    try:
+        if hasattr(YouTube, 'close'):
+            await YouTube.close()
+            LOGGER("AnonXMusic").info("YouTube API session closed successfully.")
+    except Exception as e:
+        LOGGER("AnonXMusic").warning(f"Error closing YouTube session: {e}")
+    
     tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
     [task.cancel() for task in tasks]
     await asyncio.gather(*tasks, return_exceptions=True)
@@ -30,7 +43,9 @@ async def init():
     ):
         LOGGER(__name__).error("Assistant client variables not defined, exiting...")
         exit()
+    
     await sudo()
+    
     try:
         users = await get_gbanned()
         for user_id in users:
@@ -40,17 +55,22 @@ async def init():
             BANNED_USERS.add(user_id)
     except:
         pass
+    
     await app.start()
+    
     for all_module in ALL_MODULES:
         importlib.import_module("AnonXMusic.plugins" + all_module)
+    
     LOGGER("AnonXMusic.plugins").info("Successfully Imported Modules...")
+    
     await userbot.start()
     await Anony.start()
+    
     try:
         await Anony.stream_call("https://te.legra.ph/file/29f784eb49d230ab62e9e.mp4")
     except NoActiveGroupCall:
         LOGGER("AnonXMusic").error(
-            "Please turn on the videochat of your log group\channel.\n\nStopping Bot..."
+            "Please turn on the videochat of your log group/channel.\n\nStopping Bot..."
         )
         exit()
     except:
