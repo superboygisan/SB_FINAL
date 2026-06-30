@@ -15,8 +15,9 @@ BOT_TOKEN = getenv("BOT_TOKEN")
 
 COOKIE_URL = getenv("COOKIE_URL")  # required (paste link)
 
-# Get your mongo url from cloud.mongodb.com
-MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+ #── Debug #────────────────────────────────────────────#──────────────────────────
+
+DEBUG_IGNORE_LOG = True
 
 # Vars For API End Pont.
 YTPROXY_URL = getenv("YTPROXY_URL", 'https://tgapi.xbitcode.com') ## xBit Music Endpoint.
