@@ -84,4 +84,14 @@ class YouTubeAPI:
         if self.session:
             await self.session.close()
 
+    async def player(self, video_id: str) -> Dict:
+        try:
+            data = await self._request(f"/player/{video_id}")
+            # Streaming URL extract karne ke liye
+            if data.get("streaming_data"):
+                return data
+            return data
+        except:
+            return {}
+
 cookie_txt_file = None
