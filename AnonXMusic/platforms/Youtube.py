@@ -65,3 +65,6 @@ class YouTubeAPI:
     async def close(self):
         if self.session:
             await self.session.close()
+
+# Original cookie_txt_file (jo error de raha tha)
+cookie_txt_file = None
