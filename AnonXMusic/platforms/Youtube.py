@@ -26,8 +26,8 @@ class YouTubeAPI:
             print(f"YouTubeAPI Error: {e}")
             return {"success": False, "error": str(e)}
 
-    # Yeh method zaroori hai (purane decorators ke liye)
     async def url(self, message):
+        """Message se URL ya query extract karne ke liye"""
         try:
             if message.text and message.text.startswith("http"):
                 return message.text.strip()
@@ -73,4 +73,5 @@ class YouTubeAPI:
         if self.session:
             await self.session.close()
 
+# Error fix
 cookie_txt_file = None
