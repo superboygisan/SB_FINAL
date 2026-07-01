@@ -13,6 +13,8 @@ API_HASH = getenv("API_HASH")
 # Get your token from @BotFather on Telegram.
 BOT_TOKEN = getenv("BOT_TOKEN")
 
+MONGO_DB_URI = getenv("MONGO_DB_URI", None)
+
 COOKIE_URL = getenv("COOKIE_URL")  # required (paste link)
 
  #── Debug #────────────────────────────────────────────#──────────────────────────
