@@ -19,6 +19,12 @@ COOKIE_URL = getenv("COOKIE_URL")  # required (paste link)
 
  #── Debug #────────────────────────────────────────────#──────────────────────────
 
+API_URL = getenv("API_URL")        # optional
+VIDEO_API_URL = getenv("VIDEO_API_URL")  # optional
+API_KEY = getenv("API_KEY")        # optional
+   # optional
+
+
 DEBUG_IGNORE_LOG = True
 
 # Vars For API End Pont.
