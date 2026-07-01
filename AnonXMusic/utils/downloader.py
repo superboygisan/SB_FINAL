@@ -11,11 +11,11 @@ import aiohttp
 from aiohttp import TCPConnector
 from yt_dlp import YoutubeDL
 
-from AnnieXMedia.core.dir import CACHE_DIR, DOWNLOAD_DIR
-from AnnieXMedia.utils.cookie_handler import COOKIE_PATH as _COOKIES_FILE
-from AnnieXMedia.utils.tuning import CHUNK_SIZE, SEM
+from AnonXMusic.core.dir import CACHE_DIR, DOWNLOAD_DIR
+from AnonXMusic.utils.cookie_handler import COOKIE_PATH as _COOKIES_FILE
+from AnonXMusic.utils.tuning import CHUNK_SIZE, SEM
 from config import API_KEY, API_URL, VIDEO_API_URL
-from AnnieXMedia.logging import LOGGER
+from AnonXMusic.logging import LOGGER
 
 LOGGER = LOGGER(__name__)
 
